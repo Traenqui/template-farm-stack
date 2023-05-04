@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: react-app
+    stdin_open: true
+    ports:
+      - "3000:3000"
+    networks:
+      - farm-app
+
+  backend:
+    image: api-server
+    ports: 
+      - "5000:5000"
+    depends_on:
+      - database
+    networks:
+      - farm-app
+
+  database:
+    image: mongo:latest
+    container_name: database
+    env_file:
+      - ./backend/.env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: fastapi
+    volumes:
+      - data:/data/db
+    ports:
+      - '6000:27017'
+    networks:
+      - farm-app
+
+networks:
+  farm-app:
+    driver: bridge
+
+volumes:
+  data:
+    driver: local
